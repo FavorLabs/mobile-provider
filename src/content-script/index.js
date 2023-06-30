@@ -1,7 +1,9 @@
 /* global inpageBundle */
 
 if (shouldInject()) {
+  
   injectScript(inpageBundle);
+  injectEnjoyHint();
   start();
 }
 
@@ -16,12 +18,36 @@ async function start() {
   window._metamaskSetupProvider();
 }
 
+function injectEnjoyHint() {
+  const container = document.head || document.documentElement;
+
+   // synchronously execute script in page context
+   const jQueryTag = document.createElement('script');
+   jQueryTag.setAttribute('async', true);
+   jQueryTag.setAttribute('defer', true);
+   jQueryTag.setAttribute('src', "https://code.jquery.com/jquery-1.11.3.min.js");
+     // synchronously execute script in page context
+     const hintTag = document.createElement('script');
+     hintTag.setAttribute('async', true);
+     hintTag.setAttribute('defer', true);
+     hintTag.setAttribute('src', "https://cdnjs.cloudflare.com/ajax/libs/enjoyhint/3.0.4/enjoyhint.min.js");
+     // synchronously execute script in page context
+     const hintCSS = document.createElement('link');
+     hintCSS.setAttribute('async', true);
+     hintCSS.setAttribute('rel', "stylesheet");
+     hintCSS.setAttribute('href', "https://cdnjs.cloudflare.com/ajax/libs/enjoyhint/3.0.4/enjoyhint.min.css");
+    
+  //  scriptTag.textContent = content;
+   container.insertBefore(jQueryTag, container.children[0]);
+   container.insertBefore(hintTag, container.children[0]);
+   container.insertBefore(hintCSS, container.children[0]);
+}
 /**
  * Injects a script tag into the current document
  *
  * @param {string} content - Code to be executed in the current document
  */
-function injectScript(content) {
+function injectScript(content,toRemove = false) {
   try {
     const container = document.head || document.documentElement;
 
@@ -32,7 +58,9 @@ function injectScript(content) {
     container.insertBefore(scriptTag, container.children[0]);
 
     // script executed; remove script element from DOM
-    container.removeChild(scriptTag);
+    if (toRemove){
+      container.removeChild(scriptTag);
+    }
   } catch (err) {
     console.error('MetaMask script injection failed', err);
   }
